@@ -10,26 +10,30 @@ export default function Dashboard() {
   const [loaded, setLoaded] = useState(false);
   const [imageUrl, setImageUrl] = useState();
 
+  async function fetchImageUrl() {
+    const { data, error } = await supabase.storage
+      .from("avatar/public")
+      .getPublicUrl("avatar.png");
+    setImageUrl(data.publicUrl);
+  }
+
+  useEffect(() => {
+    // Call the async function to fetch the image URL
+    fetchImageUrl();
+  }, [loaded]);
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-
     if (!file) return;
 
-    try {
-      const { data, error } = await supabase.storage
-        .from("avatar")
-        .upload(`avatar_${Date.now()}.png`, file);
-
-      if (error) {
-        console.error("Upload Error:", error);
-        return;
-      }
-
-      setImageUrl(URL.createObjectURL(file));
-      console.log("Image URL:", imageUrl);
-    } catch (err) {
-      console.error("Error:", err);
-    }
+    const { data, error } = await supabase.storage
+      .from("avatar/public")
+      .update("avatar.png", file, {
+        cacheControl: "1",
+        upsert: true,
+      });
+    console.log(error);
+    setImageUrl(URL.createObjectURL(file));
   };
 
   async function getData() {
@@ -41,10 +45,6 @@ export default function Dashboard() {
     getData(); // Call the function to fetch data
   }, [loaded]);
 
-  useEffect(() => {
-    console.log(users); // This will log the updated users data
-  }, [users]);
-
   return (
     <main className="h-screen w-full font-roboto m-8">
       <div className="ecra">
@@ -52,12 +52,10 @@ export default function Dashboard() {
           <div className="bg-[#413b60] w-full rounded-md">
             <div className="flex flex-row text-white ">
               <div className="relative">
-                <Image
-                  src={imageUrl || "/images/atilawhat.png"} // Provide a placeholder image path
-                  alt={"qwe_" + Date.now()}
-                  width={40}
-                  height={50}
-                  className="rounded-full"
+                <img
+                  src={imageUrl} // Provide a placeholder image path
+                  alt={"avatar"}
+                  className="rounded-full w-10 h-10"
                 />
                 <label
                   htmlFor="image-upload"
