@@ -4,46 +4,84 @@ import Image from "next/image";
 import Navbar from "../../components/Navbar";
 import { useEffect, useState } from "react";
 import supabase from "../../config/supabaseClient";
+import { useRouter } from "next/navigation";
+import Listusers from "@/app/components/Listusers";
 
-export default function Dashboard() {
-  const [users, setUsers] = useState();
+export default function Dashboard(props) {
+  const [users, setUsers] = useState([]);
   const [loaded, setLoaded] = useState(false);
-  const [imageUrl, setImageUrl] = useState();
+  const [imageUrl, setImageUrl] = useState(null);
+  const [name, setName] = useState();
+  const router = useRouter();
 
-  async function fetchImageUrl() {
+  async function fetchImageUrl(userName) {
+    const storagePath = `avatar`;
     const { data, error } = await supabase.storage
-      .from("avatar/public")
-      .getPublicUrl("avatar.png");
+      .from(storagePath)
+      .getPublicUrl(userName + ".png");
+
     setImageUrl(data.publicUrl);
   }
 
   useEffect(() => {
-    // Call the async function to fetch the image URL
-    fetchImageUrl();
-  }, [loaded]);
+    fetchImageUrl(props.props);
+  }, [props]);
+
+  async function getData() {
+    let { data: Users } = await supabase.from("Workers").select("name, email");
+    setUsers(Users);
+    setLoaded(true);
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  async function getName() {
+    const user = users.find((user) => user.email === props.props);
+    console.log(user);
+  }
+  useEffect(() => {
+    const user = users.find((user) => user.email === props.props);
+    if (user) {
+      setName(user.name);
+    }
+  }, [users]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const { data, error } = await supabase.storage
-      .from("avatar/public")
-      .update("avatar.png", file, {
-        cacheControl: "1",
-        upsert: true,
-      });
-    console.log(error);
-    setImageUrl(URL.createObjectURL(file));
+    try {
+      const { data, error } = await supabase.storage
+        .from("avatar/" + props.props)
+        .update("avatar.png", file, {
+          cacheControl: "1",
+          upsert: true,
+        });
+
+      if (!error) {
+        setImageUrl(URL.createObjectURL(file));
+      } else {
+        console.error("Error uploading image:", error);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
-  async function getData() {
-    let { data: Users, error } = await supabase.from("Users").select("name");
-    setUsers(Users);
-    setLoaded(true);
-  }
-  useEffect(() => {
-    getData(); // Call the function to fetch data
-  }, [loaded]);
+  const handleSignout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        router.push("/");
+      } else {
+        console.error("Error signing out:", error);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
   return (
     <main className="h-screen w-full font-roboto m-8">
@@ -85,8 +123,9 @@ export default function Dashboard() {
                 </label>
               </div>
               <div className="flex justify-center flex-col ml-2">
-                <p>David Tenda</p>
+                <p>{name}</p>
                 <p>Edit Profile {">"}</p>
+                <button onClick={handleSignout}>sign out</button>
               </div>
             </div>
           </div>
@@ -102,16 +141,13 @@ export default function Dashboard() {
               </div>
               <div>
                 {loaded &&
-                  users.map((userItem, index) => (
-                    <div
-                      key={index}
-                      className="hover:bg-gradient-to-r from-[#22f2e4]/50 to-transparent hover:border-l-4 border-[#22f2e4] py-1 first:mt-4"
-                    >
-                      <div className="text-white flex">
-                        <div className="ml-4">{userItem.name}</div>
+                  users
+                    .filter((userItem) => userItem.email !== props.props) // Filter out the user with the same email
+                    .map((userItem, index) => (
+                      <div key={index}>
+                        <Listusers props={userItem} />
                       </div>
-                    </div>
-                  ))}
+                    ))}
               </div>
             </div>
           </div>

@@ -1,15 +1,14 @@
 "use client";
-import "./globals.css";
-import Navbar from "./components/Navbar";
+
 import { usePathname } from "next/navigation";
-import supabase from "./config/supabaseClient";
+import supabase from "../config/supabaseClient";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Dashboard from "./pages/home/page";
+import Dashboard from "./home/page";
 
-export default function RootLayout({ children }) {
+export default function RootLayout() {
   const currentPathname = usePathname();
-  const exceptions = ["/", "/signup"];
+  const exceptions = ["/", "/pages/signup"];
   const [User, setUser] = useState();
   const redirect = exceptions.includes(currentPathname);
   // Show the navbar for all paths except "/"
@@ -34,8 +33,8 @@ export default function RootLayout({ children }) {
     }
   }, [loading]);
   return (
-    <html lang="en">
-      <body className="overflow-hidden bg-[#39304f]">{children}</body>
-    </html>
+    <div className="overflow-hidden bg-[#39304f]">
+      <Dashboard props={User} />
+    </div>
   );
 }
