@@ -3,6 +3,7 @@ import "tailwindcss/tailwind.css";
 import supabase from "./config/supabaseClient";
 
 import React, { useState, useEffect } from "react";
+import { serialize, parse } from "cookie";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -19,22 +20,11 @@ export default function Home() {
   };
 
   const handleLogin = async (e) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) {
-        console.error("Login error:", error.message);
-      } else {
-        console.log("User logged in:", data.user);
-        // Redirect to the dashboard or home page upon successful login
-        router.push("/pages/home");
-      }
-    } catch (error) {
-      console.error("Error:", error.message);
-    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    router.push("/pages/home");
   };
 
   return (

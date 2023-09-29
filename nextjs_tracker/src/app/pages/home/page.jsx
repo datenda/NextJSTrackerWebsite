@@ -1,11 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import Navbar from "../../components/Navbar";
 import { useEffect, useState } from "react";
 import supabase from "../../config/supabaseClient";
 import { useRouter } from "next/navigation";
 import Listusers from "@/app/components/Listusers";
+import Barchart from "@/app/components/Barchart";
+import Doughnutchart from "@/app/components/Doughnutchart";
+
+import {
+  DateRangePicker,
+  DateRangePickerItem,
+  DateRangePickerValue,
+} from "@tremor/react";
+import Linechart from "@/app/components/Linechart";
 
 export default function Dashboard(props) {
   const [users, setUsers] = useState([]);
@@ -13,6 +21,13 @@ export default function Dashboard(props) {
   const [imageUrl, setImageUrl] = useState(null);
   const [name, setName] = useState();
   const router = useRouter();
+  const DateRangePickerValue = {
+    from: new Date(2023, 1, 1),
+    to: new Date(),
+  };
+  const [value, setValue] = useState(DateRangePickerValue);
+
+  let table = ["random", "random", "random", "random", "random", "random"];
 
   async function fetchImageUrl(userName) {
     const storagePath = `avatar`;
@@ -37,14 +52,15 @@ export default function Dashboard(props) {
     getData();
   }, []);
 
-  async function getName() {
-    const user = users.find((user) => user.email === props.props);
-    console.log(user);
-  }
   useEffect(() => {
     const user = users.find((user) => user.email === props.props);
+    console.log(users);
     if (user) {
+      // If a matching user is found, set the name state to the user's name
       setName(user.name);
+    } else {
+      // If no matching user is found, you can handle it as per your requirement
+      setName("User not found");
     }
   }, [users]);
 
@@ -84,76 +100,79 @@ export default function Dashboard(props) {
   };
 
   return (
-    <main className="h-screen w-full font-roboto m-8">
-      <div className="ecra">
-        <div className="coluna 1 w-[15%] h-full">
-          <div className="bg-[#413b60] w-full rounded-md">
-            <div className="flex flex-row text-white ">
-              <div className="relative">
-                <img
-                  src={imageUrl} // Provide a placeholder image path
-                  alt={"avatar"}
-                  className="rounded-full w-10 h-10"
-                />
-                <label
-                  htmlFor="image-upload"
-                  className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 cursor-pointer hover:bg-blue-600"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              </div>
-              <div className="flex justify-center flex-col ml-2">
-                <p>{name}</p>
-                <p>Edit Profile {">"}</p>
-                <button onClick={handleSignout}>sign out</button>
+    <main className=" flex h-full w-full font-roboto justify-end flex-col">
+      <div className="flex w-full justify-center">
+        <DateRangePicker
+          className="max-w-md mx-auto mb-4"
+          value={value}
+          onValueChange={setValue}
+          selectPlaceholder="Seleccionar"
+          color="rose"
+        />
+      </div>
+      <div className="ecra flex">
+        <div className="flex w-full flex-col">
+          <div className="flex">
+            <div className="flex w-1/2 h-80">
+              <Barchart title={"Done trips"} />
+            </div>
+            <div className="bg-[#413b60] rounded-md flex h-80 w-1/2 ml-4">
+              <div className="flex flex-col w-full my-4">
+                <div className="flex justify-center">
+                  <div className="flex items-center justify-center border-b w-full flex-col text-white">
+                    <div className="font-bold text-2xl">Trips</div>
+                    <div className="flex flex-row w-full justify-around">
+                      {table.map((item, index) => (
+                        <div className="flex justify-around" key={index}>
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  {loaded &&
+                    users
+                      .filter((userItem) => userItem.email !== props.props) // Filter out the user with the same email
+                      .map((userItem, index) => (
+                        <div key={index}>
+                          <Listusers props={userItem} />
+                        </div>
+                      ))}
+                </div>
               </div>
             </div>
           </div>
-          <div>
-            <Navbar />
-          </div>
-          <div className="bg-[#413b60] rounded-md flex h-full w-full mt-8 ">
-            <div className="flex flex-col w-full my-4">
-              <div className="flex justify-center">
-                <div className="flex items-center justify-center pb-4 border-b-2 w-2/3">
-                  <div className="text-white font-bold text-2xl">Users</div>{" "}
+          <div className="flex flex-row w-full  mt-10">
+            <div className="flex w-1/2">
+              <div className="w-1/2">
+                <Doughnutchart title={"How many are working"} />
+              </div>
+              <div className="bg-[#413b60] rounded-lg flex h-full w-1/2 ml-4 ">
+                <div className="flex flex-col w-full my-4">
+                  <div className="flex justify-center">
+                    <div className="font-bold text-2xl text-white">
+                      Working people
+                    </div>
+                  </div>
+                  <div>
+                    {loaded &&
+                      users
+                        .filter((userItem) => userItem.email !== props.props) // Filter out the user with the same email
+                        .map((userItem, index) => (
+                          <div key={index}>
+                            <Listusers props={userItem} />
+                          </div>
+                        ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                {loaded &&
-                  users
-                    .filter((userItem) => userItem.email !== props.props) // Filter out the user with the same email
-                    .map((userItem, index) => (
-                      <div key={index}>
-                        <Listusers props={userItem} />
-                      </div>
-                    ))}
-              </div>
+            </div>
+            <div className="flex w-1/2">
+              <Linechart title={"Fuel consumed"} />
             </div>
           </div>
         </div>
-
-        <div className="coluna 2"></div>
       </div>
     </main>
   );
