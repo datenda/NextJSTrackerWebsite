@@ -8,11 +8,7 @@ import Listusers from "@/app/components/Listusers";
 import Barchart from "@/app/components/Barchart";
 import Doughnutchart from "@/app/components/Doughnutchart";
 
-import {
-  DateRangePicker,
-  DateRangePickerItem,
-  DateRangePickerValue,
-} from "@tremor/react";
+import { DateRangePicker, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
 import Linechart from "@/app/components/Linechart";
 
 export default function Dashboard(props) {
@@ -31,9 +27,7 @@ export default function Dashboard(props) {
 
   async function fetchImageUrl(userName) {
     const storagePath = `avatar`;
-    const { data, error } = await supabase.storage
-      .from(storagePath)
-      .getPublicUrl(userName + ".png");
+    const { data, error } = await supabase.storage.from(storagePath).getPublicUrl(userName + ".png");
 
     setImageUrl(data.publicUrl);
   }
@@ -53,7 +47,7 @@ export default function Dashboard(props) {
   }, []);
 
   useEffect(() => {
-    const user = users.find((user) => user.email === props.props);
+    const user = users.find(user => user.email === props.props);
     console.log(users);
     if (user) {
       // If a matching user is found, set the name state to the user's name
@@ -64,17 +58,15 @@ export default function Dashboard(props) {
     }
   }, [users]);
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = async e => {
     const file = e.target.files[0];
     if (!file) return;
 
     try {
-      const { data, error } = await supabase.storage
-        .from("avatar/" + props.props)
-        .update("avatar.png", file, {
-          cacheControl: "1",
-          upsert: true,
-        });
+      const { data, error } = await supabase.storage.from("avatar/" + props.props).update("avatar.png", file, {
+        cacheControl: "1",
+        upsert: true,
+      });
 
       if (!error) {
         setImageUrl(URL.createObjectURL(file));
@@ -100,23 +92,14 @@ export default function Dashboard(props) {
   };
 
   return (
-    <main className=" flex h-full w-full font-roboto justify-end flex-col">
-      <div className="flex w-full justify-center">
-        <DateRangePicker
-          className="max-w-md mx-auto mb-4"
-          value={value}
-          onValueChange={setValue}
-          selectPlaceholder="Seleccionar"
-          color="rose"
-        />
-      </div>
+    <main className=" flex h-full w-full font-roboto justify-end flex-col mt-8">
       <div className="ecra flex">
         <div className="flex w-full flex-col">
-          <div className="flex">
-            <div className="flex w-1/2 h-80">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="">
               <Barchart title={"Done trips"} />
             </div>
-            <div className="bg-[#413b60] rounded-md flex h-80 w-1/2 ml-4">
+            <div className="bg-[#413b60] rounded-md flex">
               <div className="flex flex-col w-full my-4">
                 <div className="flex justify-center">
                   <div className="flex items-center justify-center border-b w-full flex-col text-white">
@@ -133,7 +116,7 @@ export default function Dashboard(props) {
                 <div>
                   {loaded &&
                     users
-                      .filter((userItem) => userItem.email !== props.props) // Filter out the user with the same email
+                      .filter(userItem => userItem.email !== props.props) // Filter out the user with the same email
                       .map((userItem, index) => (
                         <div key={index}>
                           <Listusers props={userItem} />
@@ -143,32 +126,29 @@ export default function Dashboard(props) {
               </div>
             </div>
           </div>
-          <div className="flex flex-row w-full  mt-10">
-            <div className="flex w-1/2">
-              <div className="w-1/2">
+
+          <div className="flex flex-col lg:flex-row w-full mt-10">
+            <div className="w-full lg:w-1/2 flex flex-col lg:flex-row">
+              <div className="w-full lg:w-1/2 mb-4 lg:mb-0 lg:mr-4">
                 <Doughnutchart title={"How many are working"} />
               </div>
-              <div className="bg-[#413b60] rounded-lg flex h-full w-1/2 ml-4 ">
-                <div className="flex flex-col w-full my-4">
-                  <div className="flex justify-center">
-                    <div className="font-bold text-2xl text-white">
-                      Working people
-                    </div>
-                  </div>
-                  <div>
-                    {loaded &&
-                      users
-                        .filter((userItem) => userItem.email !== props.props) // Filter out the user with the same email
-                        .map((userItem, index) => (
-                          <div key={index}>
-                            <Listusers props={userItem} />
-                          </div>
-                        ))}
-                  </div>
+              <div className="bg-[#413b60] rounded-lg flex flex-col w-full lg:w-1/2">
+                <div className="flex justify-center">
+                  <div className="font-bold text-2xl text-white">Working people</div>
+                </div>
+                <div>
+                  {loaded &&
+                    users
+                      .filter(userItem => userItem.email !== props.props) // Filter out the user with the same email
+                      .map((userItem, index) => (
+                        <div key={index}>
+                          <Listusers props={userItem} />
+                        </div>
+                      ))}
                 </div>
               </div>
             </div>
-            <div className="flex w-1/2">
+            <div className="w-full lg:w-1/2 mt-4 lg:mt-0 lg:ml-4">
               <Linechart title={"Fuel consumed"} />
             </div>
           </div>

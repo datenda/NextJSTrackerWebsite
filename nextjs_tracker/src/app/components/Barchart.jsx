@@ -1,23 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function Barchart(title) {
   const [chartData, setChartData] = useState({
@@ -76,8 +61,9 @@ export default function Barchart(title) {
     });
   }, []);
   return (
-    <div className="bg-[#413b60] w-full rounded-md ml-4 text-white">
+    <div className="bg-[#413b60] w-full rounded-md text-white">
       <Bar data={chartData} options={chartOptions} />
     </div>
+  
   );
 }

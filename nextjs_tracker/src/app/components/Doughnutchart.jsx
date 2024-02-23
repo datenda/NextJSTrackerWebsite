@@ -18,10 +18,7 @@ export default function Doughnutchart(title) {
         {
           label: "# of Votes",
           data: [12, 19],
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.8)",
-            "rgba(54, 162, 235, 0.8)",
-          ],
+          backgroundColor: ["rgba(255, 99, 132, 0.8)", "rgba(54, 162, 235, 0.8)"],
           borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
           borderWidth: 1,
         },
@@ -47,7 +44,7 @@ export default function Doughnutchart(title) {
     });
   }, []);
   return (
-    <div className="bg-[#413b60] rounded-md ml-4 text-white pb-4 h-full text-xl">
+    <div className="bg-[#413b60] rounded-md text-white pb-4 h-full text-xl">
       <Doughnut data={chartData} options={chartOptions} />
     </div>
   );

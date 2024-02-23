@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleUser = async (e) => {
+  const handleUser = async e => {
     const { data, error } = await supabase.auth.getSession();
     const user = data;
     if (!user.session) {
@@ -43,11 +43,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body
-        className={` ${
-          shouldShowNavbar ? "overflow-hidden bg-[#39304f] flex p-8 " : "p-0"
-        }`}
-      >
+      <body className={` ${shouldShowNavbar ? "bg-[#39304f] flex p-4" : "p-0"}`}>
         {shouldShowNavbar && <Navbar props={User} />}
         <div className="w-full">{children}</div>
       </body>

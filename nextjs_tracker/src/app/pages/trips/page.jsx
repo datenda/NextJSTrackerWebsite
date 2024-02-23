@@ -26,18 +26,9 @@ const DataCollectionForm = () => {
     timeFromArrival: "",
   });
 
-  let table = [
-    "driver",
-    "vehicle",
-    "date of starting point",
-    "date of arrival",
-    "arrival",
-    "starting point",
-    "time start",
-    "time of arrival",
-  ];
+  let table = ["driver", "vehicle", "date of starting point", "date of arrival", "arrival", "starting point", "time start", "time of arrival"];
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -56,9 +47,7 @@ const DataCollectionForm = () => {
     let { data: Travels, error1 } = await supabase.from("Travels").select("*");
     setTrips(Travels);
 
-    let { data: Vehicles, error2 } = await supabase
-      .from("Vehicles")
-      .select("car");
+    let { data: Vehicles, error2 } = await supabase.from("Vehicles").select("car");
     setVehicle(Vehicles);
     setLoading(true);
   }
@@ -67,7 +56,7 @@ const DataCollectionForm = () => {
     handleList();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     const { data, error } = await supabase
@@ -96,172 +85,130 @@ const DataCollectionForm = () => {
       </div>
 
       <div className=" ml-8 flex w-full">
-        <div className="bg-[#413b60] w-3/4 rounded-lg">
-          <div className="flex flex-row w-full justify-around mt-4 border-b ">
-            {table.map((item, index) => (
-              <div key={index} className="">
-                {item}
-              </div>
-            ))}
+        <div className="flex-col">
+          <div className="bg-[#413b60] w-3/4 rounded-lg">
+            <div className="flex flex-row w-full justify-around mt-4 border-b ">
+              {table.map((item, index) => (
+                <div key={index} className="">
+                  {item}
+                </div>
+              ))}
+            </div>
+            {loading &&
+              trips.map(trip => (
+                <div className="" key={trip.id}>
+                  <ListTrips trips={trip} />
+                </div>
+              ))}
           </div>
-          {loading &&
-            trips.map((trip) => (
-              <div className="" key={trip.id}>
-                <ListTrips trips={trip} />
-              </div>
-            ))}
-        </div>
-        <div className="flex w-1/5 ml-8 ">
-          <div className="p-6 rounded-lg shadow-lg text-white bg-[#413b60]">
-            <h1 className="text-2xl font-semibold mb-4">
-              Data Collection Form
-            </h1>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label
-                  htmlFor="startingPoint"
-                  className="block mb-2 font-medium"
-                >
-                  Starting Point:
-                </label>
-                <input
-                  type="text"
-                  id="startingPoint"
-                  name="startingPoint"
-                  value={formData.startingPoint}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                />
-              </div>
+          <div className="flex w-1/5 ml-8 ">
+            <div className="p-6 rounded-lg shadow-lg text-white bg-[#413b60]">
+              <h1 className="text-2xl font-semibold mb-4">Data Collection Form</h1>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label htmlFor="startingPoint" className="block mb-2 font-medium">
+                    Starting Point:
+                  </label>
+                  <input
+                    type="text"
+                    id="startingPoint"
+                    name="startingPoint"
+                    value={formData.startingPoint}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg text-black"
+                    required
+                  />
+                </div>
 
-              <div className="mb-4">
-                <label htmlFor="arrival" className="block mb-2 font-medium">
-                  Arrival:
-                </label>
-                <input
-                  type="text"
-                  id="arrival"
-                  name="arrival"
-                  value={formData.arrival}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                />
-              </div>
+                <div className="mb-4">
+                  <label htmlFor="arrival" className="block mb-2 font-medium">
+                    Arrival:
+                  </label>
+                  <input type="text" id="arrival" name="arrival" value={formData.arrival} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg text-black" required />
+                </div>
 
-              <div className="mb-4">
-                <label htmlFor="driver" className="block mb-2 font-medium">
-                  Driver:
-                </label>
-                <select
-                  id="driver"
-                  name="driver"
-                  value={formData.driver}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                >
-                  {vehicle.map((vehicle, index) => (
-                    <option key={index} value={vehicle.car}>
-                      {vehicle.car}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-4">
-                <label htmlFor="driver" className="block mb-2 font-medium">
-                  Driver:
-                </label>
-                <select
-                  id="driver"
-                  name="driver"
-                  value={formData.driver}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                >
-                  {workers.map((driver) => (
-                    <option key={driver.id} value={driver.id}>
-                      {driver.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="mb-4">
+                  <label htmlFor="driver" className="block mb-2 font-medium">
+                    Driver:
+                  </label>
+                  <select id="driver" name="driver" value={formData.driver} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg text-black" required>
+                    {vehicle.map((vehicle, index) => (
+                      <option key={index} value={vehicle.car}>
+                        {vehicle.car}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="driver" className="block mb-2 font-medium">
+                    Driver:
+                  </label>
+                  <select id="driver" name="driver" value={formData.driver} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg text-black" required>
+                    {workers.map(driver => (
+                      <option key={driver.id} value={driver.id}>
+                        {driver.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="mb-4">
-                <label htmlFor="date" className="block mb-2 font-medium">
-                  Date of starting point:
-                </label>
-                <input
-                  type="date"
-                  id="date_starting_point"
-                  name="date_starting_point"
-                  value={formData.date_starting_point}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                />
-              </div>
+                <div className="mb-4">
+                  <label htmlFor="date" className="block mb-2 font-medium">
+                    Date of starting point:
+                  </label>
+                  <input
+                    type="date"
+                    id="date_starting_point"
+                    name="date_starting_point"
+                    value={formData.date_starting_point}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg text-black"
+                    required
+                  />
+                </div>
 
-              <div className="mb-4">
-                <label htmlFor="date" className="block mb-2 font-medium">
-                  Date of arrival:
-                </label>
-                <input
-                  type="date"
-                  id="date_arrival"
-                  name="date_arrival"
-                  value={formData.date_arrival}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                />
-              </div>
+                <div className="mb-4">
+                  <label htmlFor="date" className="block mb-2 font-medium">
+                    Date of arrival:
+                  </label>
+                  <input type="date" id="date_arrival" name="date_arrival" value={formData.date_arrival} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg text-black" required />
+                </div>
 
-              <div className="mb-4">
-                <label
-                  htmlFor="timeFromStart"
-                  className="block mb-2 font-medium"
-                >
-                  Time from Starting Point:
-                </label>
-                <input
-                  type="time"
-                  id="timeFromStart"
-                  name="timeFromStart"
-                  value={formData.timeFromStart}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                />
-              </div>
+                <div className="mb-4">
+                  <label htmlFor="timeFromStart" className="block mb-2 font-medium">
+                    Time from Starting Point:
+                  </label>
+                  <input
+                    type="time"
+                    id="timeFromStart"
+                    name="timeFromStart"
+                    value={formData.timeFromStart}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg text-black"
+                    required
+                  />
+                </div>
 
-              <div className="mb-4">
-                <label
-                  htmlFor="timeFromArrival"
-                  className="block mb-2 font-medium"
-                >
-                  Time from Arrival:
-                </label>
-                <input
-                  type="time"
-                  id="timeFromArrival"
-                  name="timeFromArrival"
-                  value={formData.timeFromArrival}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg text-black"
-                  required
-                />
-              </div>
+                <div className="mb-4">
+                  <label htmlFor="timeFromArrival" className="block mb-2 font-medium">
+                    Time from Arrival:
+                  </label>
+                  <input
+                    type="time"
+                    id="timeFromArrival"
+                    name="timeFromArrival"
+                    value={formData.timeFromArrival}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg text-black"
+                    required
+                  />
+                </div>
 
-              <button
-                type="submit"
-                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none"
-              >
-                Submit
-              </button>
-            </form>
+                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none">
+                  Submit
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
